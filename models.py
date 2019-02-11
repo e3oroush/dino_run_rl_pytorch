@@ -1,10 +1,11 @@
 from utils import DinoSeleniumEnv, show_image, IMAGE_CHANNELS, IMAGE_WIDTH, IMAGE_HEIGHT
 import torch
 from torch import nn
-from keras.layers.core import Dense, Dropout, Activation, Flatten
-from keras.layers.convolutional import Conv2D, MaxPooling2D
-from keras.optimizers import Adam
-from keras.models import Sequential
+from torch.nn import functional as F
+# from keras.layers.core import Dense, Dropout, Activation, Flatten
+# from keras.layers.convolutional import Conv2D, MaxPooling2D
+# from keras.optimizers import Adam
+# from keras.models import Sequential
 
 class Agent(object):
     def __init__(self, env): # takes dino game environment as input
@@ -58,6 +59,7 @@ class FlattenTorch(nn.Module):
 class QNetwork(nn.Module):
     def __init__(self, nb_actions, hidden_size=512):
         super(QNetwork, self).__init__()
+        self.bn0 = nn.BatchNorm2d(IMAGE_CHANNELS)
         self.image_encoder = nn.Sequential(nn.Conv2d(IMAGE_CHANNELS, 32, 7, stride=4, padding=2),
                                             nn.MaxPool2d(2),
                                             nn.ReLU(),
@@ -75,27 +77,28 @@ class QNetwork(nn.Module):
     def forward(self, image):
         if next(self.parameters()).is_cuda:
             image = image.cuda()
+        image = self.bn0(image)
         encoded_features = self.image_encoder(image)
         return self.q_value_estimator(encoded_features)
 
 
-def build_keras_model():
-    print("Now we build the model")
-    model = Sequential()
-    model.add(Conv2D(32, (8, 8), padding='same',strides=(4, 4),input_shape=(IMAGE_WIDTH,IMAGE_HEIGHT,IMAGE_CHANNELS)))  #80*80*4
-    model.add(MaxPooling2D(pool_size=(2,2)))
-    model.add(Activation('relu'))
-    model.add(Conv2D(64, (4, 4),strides=(2, 2),  padding='same'))
-    model.add(MaxPooling2D(pool_size=(2,2)))
-    model.add(Activation('relu'))
-    model.add(Conv2D(64, (3, 3),strides=(1, 1),  padding='same'))
-    model.add(MaxPooling2D(pool_size=(2,2)))
-    model.add(Activation('relu'))
-    model.add(Flatten())
-    model.add(Dense(512))
-    model.add(Activation('relu'))
-    model.add(Dense(2))
-    adam = Adam(lr=1e-4)
-    model.compile(loss='mse',optimizer=adam)
+# def build_keras_model():
+#     print("Now we build the model")
+#     model = Sequential()
+#     model.add(Conv2D(32, (8, 8), padding='same',strides=(4, 4),input_shape=(IMAGE_WIDTH,IMAGE_HEIGHT,IMAGE_CHANNELS)))  #80*80*4
+#     model.add(MaxPooling2D(pool_size=(2,2)))
+#     model.add(Activation('relu'))
+#     model.add(Conv2D(64, (4, 4),strides=(2, 2),  padding='same'))
+#     model.add(MaxPooling2D(pool_size=(2,2)))
+#     model.add(Activation('relu'))
+#     model.add(Conv2D(64, (3, 3),strides=(1, 1),  padding='same'))
+#     model.add(MaxPooling2D(pool_size=(2,2)))
+#     model.add(Activation('relu'))
+#     model.add(Flatten())
+#     model.add(Dense(512))
+#     model.add(Activation('relu'))
+#     model.add(Dense(2))
+#     adam = Adam(lr=1e-4)
+#     model.compile(loss='mse',optimizer=adam)
     
-    return model
+#     return model
