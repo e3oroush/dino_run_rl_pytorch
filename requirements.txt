@@ -1,0 +1,5 @@
+pytorch=1.0.1=py3.6_cuda10.0.130_cudnn7.4.2_2
+numpy=1.15.4=pypi_0
+pillow=5.3.0=py36h34e0f95_0
+opencv-python=3.4.1.15=pypi_0
+selenium=3.141.0=pypi_0

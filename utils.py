@@ -13,17 +13,14 @@ IMAGE_WIDTH,IMAGE_HEIGHT=80,80
 IMAGE_CHANNELS=4
 ROI=300,500
 class DinoSeleniumEnv(object):
-    def __init__(self, chrome_driver_path):
-        #scripts
-        #create id for canvas for faster selection from DOM
+    def __init__(self, chrome_driver_path, speed=0):
         init_script = "document.getElementsByClassName('runner-canvas')[0].id = 'runner-canvas'"
-
         options = Options()
         options.add_argument("--mute-audio")
         options.add_argument("disable-infobars")
         self._driver = webdriver.Chrome(executable_path=chrome_driver_path,chrome_options=options)
         self._driver.get("chrome://dino")
-        self._driver.execute_script("Runner.config.ACCELERATION=0")
+        self._driver.execute_script("Runner.config.ACCELERATION=%d"%speed)
         self._driver.execute_script(init_script)
     
     def press_up(self):
@@ -89,8 +86,3 @@ def get_logger(logger_name, filename=None, logging_mode="DEBUG"):
         logger_instances[logger_name].addHandler(console_handler)
         logger_instances[logger_name].setLevel(level=getattr(logging,logging_mode))
     return logger_instances[logger_name]
-
-if __name__ == '__main__':
-    game = DinoSeleniumEnv("/home/esoroush/github/chromedriver")
-    game.press_up()
-    time.sleep(20)
