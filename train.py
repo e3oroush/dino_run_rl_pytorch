@@ -159,7 +159,7 @@ def train(args):
                     sum_scores = 0
                 total_loss = 0
                 episodes = 0
-            if t % save_frequency and not args.exploiting == 0:
+            if t % save_frequency and not args.exploiting:
                 env.pause_game()
                 with open("cache.p", "wb") as fh:
                     pickle.dump((t,memory,epsilon, nb_episodes), fh)
